@@ -39,17 +39,17 @@ A LRN element
         }
       },
       listeners: {
-        'haxAction': '_triggerSave',
+        'action': '_triggerSave',
       },
       _triggerSave: function(e) {
-        if (e.action == 'save') {
+        if (e.detail.action == 'save') {
           alert("Thank you for hitting save");
+          console.log(this.attributes);
+          console.log(e);
+          this.$$('#hax-endpoint').properties = e.properties;
+          // trigger it to run
+          this.$$('#hax-endpoint').generateRequest;
         }
-        console.log(this.attributes);
-        console.log(e);
-        this.$$('#hax-endpoint').properties = e.properties;
-        // trigger it to run
-        this.$$('#hax-endpoint').auto = true;
       },
       haxAjaxResponse: function(e) {
         console.log('handle ajax response');
