@@ -11,21 +11,21 @@ A LRN element
   <template>
     <style>
       :host {
-        display: block;
       }
     </style>
     <content></content>
     <iron-ajax
-       url="[[url]]"
-       handle-as="json"
-       on-response="haxAjaxResponse" id="hax-endpoint"></iron-ajax>
+      id="haxajax"
+      url="[[url]]"
+      params=""
+      handle-as="json"
+      on-response="haxAjaxResponse"
+      ></iron-ajax>
   </template>
 
   <script>
     Polymer({
-
       is: 'hax-ajax',
-
       properties: {
         /**
          * The url endpoint to save operations once noticed.
@@ -33,26 +33,34 @@ A LRN element
         url: {
           type: String
         },
-        canHax: {
+        /**
+         * If hax should be hidden or not.
+         */
+        hideHax: {
           type: Boolean,
           value: false,
         }
       },
       listeners: {
-        'action': '_triggerSave',
+        'haxAction': '_triggerHaxSave',
       },
-      _triggerSave: function(e) {
+      /**
+       * Handle a save event bubbling up from
+       * some place down below in the DOM.
+       */
+      _triggerHaxSave: function(e) {
         if (e.detail.action == 'save') {
-          alert("Thank you for hitting save");
-          console.log(this.attributes);
-          console.log(e);
-          this.$$('#hax-endpoint').properties = e.properties;
+          let root = this;
+          console.log(e.detail);
+          console.log(root.$$('#haxajax'));
+          root.$$('#haxajax').params = e.detail.properties;
           // trigger it to run
-          this.$$('#hax-endpoint').generateRequest;
+          root.$$('#haxajax').generateRequest();
         }
       },
       haxAjaxResponse: function(e) {
         console.log('handle ajax response');
+        console.log(e);
       },
     });
   </script>
