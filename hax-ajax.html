@@ -17,7 +17,6 @@ A LRN element
     <iron-ajax
       id="haxajax"
       url="[[url]]"
-      params=""
       handle-as="json"
       on-response="haxAjaxResponse"
       ></iron-ajax>
@@ -50,17 +49,24 @@ A LRN element
        */
       _triggerHaxSave: function(e) {
         if (e.detail.action == 'save') {
-          let root = this;
           console.log(e.detail);
-          console.log(root.$$('#haxajax'));
-          root.$$('#haxajax').params = e.detail.properties;
+          let root = this;
+          var params = {};
+          var key;
+          var value;
+          for (i = 0; i < e.detail.attributes.length; i++) {
+            params[e.detail.attributes[i].name] = e.detail.attributes[i].value;
+          }
+          params['innerHTML'] = e.detail.attributes.innerHTML;
+          params['tagName'] = e.detail.attributes.tagName;
+
+          root.$$('#haxajax').params = params;
           // trigger it to run
           root.$$('#haxajax').generateRequest();
         }
       },
       haxAjaxResponse: function(e) {
         console.log('handle ajax response');
-        console.log(e);
       },
     });
   </script>
