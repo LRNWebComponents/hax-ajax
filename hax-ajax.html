@@ -17,6 +17,7 @@ A small smart component that notices saves on HAX enabled content it wraps.
     </style>
     <content></content>
     <iron-ajax
+      auto="{{auto}}"
       id="haxajax"
       url="[[url]]"
       handle-as="json"
@@ -35,6 +36,10 @@ A small smart component that notices saves on HAX enabled content it wraps.
          */
         url: {
           type: String
+        },
+        auto: {
+          type: Boolean,
+          value: false
         },
         /**
          * If hax should be hidden or not.
@@ -75,13 +80,22 @@ A small smart component that notices saves on HAX enabled content it wraps.
       },
       haxAjaxResponse: function(e) {
         let root = this;
-        console.log(e);
-        // look for a nice response
-        if (root.saveResponse.code == 200) {
-          root.msg = 'Item saved!';
-          root.$$('#response').opened = true;
+        // ensure there's a request that went through at all
+        if (typeof root.saveResponse !== "undefined" && root.saveResponse != null) {
+          // look for a nice response
+          if (typeof root.saveResponse.status !== "undefined" && root.saveResponse.status == 200) {
+            root.msg = 'Item updated!';
+          }
+          else {
+            root.msg = 'Something went wrong! (bad response)';
+            console.log(root.saveResponse);
+          }
         }
-
+        else {
+          root.msg = 'Something went wrong! (invalid request)';
+          console.log(e);
+        }
+        root.$$('#response').opened = true;
       },
     });
   </script>
