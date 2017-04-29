@@ -1,8 +1,10 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-toast/paper-toast.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
 
 <!--
 `hax-ajax`
-A LRN element
+A small smart component that notices saves on HAX enabled content it wraps.
 
 @demo demo/index.html
 -->
@@ -19,7 +21,9 @@ A LRN element
       url="[[url]]"
       handle-as="json"
       on-response="haxAjaxResponse"
+      last-response="{{saveResponse}}"
       ></iron-ajax>
+    <paper-toast text="{{msg}}" id="response"></paper-toast>
   </template>
 
   <script>
@@ -38,6 +42,9 @@ A LRN element
         hideHax: {
           type: Boolean,
           value: false,
+        },
+        saveResponse: {
+          type: Object
         }
       },
       listeners: {
@@ -49,24 +56,32 @@ A LRN element
        */
       _triggerHaxSave: function(e) {
         if (e.detail.action == 'save') {
-          console.log(e.detail);
           let root = this;
           var params = {};
-          var key;
-          var value;
+          var key, value;
+          // look through the possible items and remap to params array
           for (i = 0; i < e.detail.attributes.length; i++) {
             params[e.detail.attributes[i].name] = e.detail.attributes[i].value;
           }
+          // include innerHTML just to see
           params['innerHTML'] = e.detail.attributes.innerHTML;
-          params['tagName'] = e.detail.attributes.tagName;
-
+          // bring in tag name for things to match the element mapping internally
+          params['tagName'] = e.detail.attributes.tagName.toLowerCase();
+          // set params
           root.$$('#haxajax').params = params;
           // trigger it to run
           root.$$('#haxajax').generateRequest();
         }
       },
       haxAjaxResponse: function(e) {
-        console.log('handle ajax response');
+        let root = this;
+        console.log(e);
+        // look for a nice response
+        if (root.saveResponse.code == 200) {
+          root.msg = 'Item saved!';
+          root.$$('#response').opened = true;
+        }
+
       },
     });
   </script>
