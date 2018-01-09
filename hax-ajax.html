@@ -11,11 +11,7 @@ A small smart component that notices saves on HAX enabled content it wraps.
 
 <dom-module id="hax-ajax">
   <template>
-    <style>
-      :host {
-      }
-    </style>
-    <content></content>
+    <slot></slot>
     <iron-ajax
       auto="{{auto}}"
       id="haxajax"
@@ -24,7 +20,7 @@ A small smart component that notices saves on HAX enabled content it wraps.
       on-response="haxAjaxResponse"
       last-response="{{saveResponse}}"
       ></iron-ajax>
-    <paper-toast text="{{msg}}" id="response"></paper-toast>
+    <paper-toast text="[[msg]]" id="response"></paper-toast>
   </template>
 
   <script>
@@ -35,11 +31,14 @@ A small smart component that notices saves on HAX enabled content it wraps.
          * The url endpoint to save operations once noticed.
          */
         url: {
-          type: String
+          type: String,
         },
+        /**
+         * Automatically submit
+         */
         auto: {
           type: Boolean,
-          value: false
+          value: false,
         },
         /**
          * If hax should be hidden or not.
@@ -48,9 +47,12 @@ A small smart component that notices saves on HAX enabled content it wraps.
           type: Boolean,
           value: false,
         },
+        /**
+         * Response object.
+         */
         saveResponse: {
-          type: Object
-        }
+          type: Object,
+        },
       },
       listeners: {
         'haxAction': '_triggerHaxSave',
@@ -61,7 +63,6 @@ A small smart component that notices saves on HAX enabled content it wraps.
        */
       _triggerHaxSave: function(e) {
         if (e.detail.action == 'save') {
-          let root = this;
           var params = {};
           var key, value;
           // look through the possible items and remap to params array
@@ -73,29 +74,28 @@ A small smart component that notices saves on HAX enabled content it wraps.
           // bring in tag name for things to match the element mapping internally
           params['tagName'] = e.detail.attributes.tagName.toLowerCase();
           // set params
-          root.$$('#haxajax').params = params;
+          this.$.haxajax.params = params;
           // trigger it to run
-          root.$$('#haxajax').generateRequest();
+          this.$.haxajax.generateRequest();
         }
       },
       haxAjaxResponse: function(e) {
-        let root = this;
         // ensure there's a request that went through at all
-        if (typeof root.saveResponse !== "undefined" && root.saveResponse != null) {
+        if (typeof this.saveResponse !== "undefined" && this.saveResponse != null) {
           // look for a nice response
-          if (typeof root.saveResponse.status !== "undefined" && root.saveResponse.status == 200) {
-            root.msg = 'Item updated!';
+          if (typeof this.saveResponse.status !== "undefined" && this.saveResponse.status == 200) {
+            this.msg = 'Item updated!';
           }
           else {
-            root.msg = 'Something went wrong! (bad response)';
-            console.log(root.saveResponse);
+            this.msg = 'Something went wrong! (bad response)';
+            console.log(this.saveResponse);
           }
         }
         else {
-          root.msg = 'Something went wrong! (invalid request)';
+          this.msg = 'Something went wrong! (invalid request)';
           console.log(e);
         }
-        root.$$('#response').opened = true;
+        this.$.response.opened = true;
       },
     });
   </script>
